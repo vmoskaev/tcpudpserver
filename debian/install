@@ -1,0 +1,2 @@
+tcpudpserver	usr/bin/
+*.service	etc/systemd/

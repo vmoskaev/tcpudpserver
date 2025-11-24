@@ -1,0 +1,12 @@
+Source: tcpudpserver
+Section: main
+Priority: optional
+Maintainer: Владимир Москаев <vmoskaev@mail.ru>
+Build-Depends: debhelper (>= 9), gcc, make, cmake, build-essential
+Standards-Version: 3.9.8
+
+Package: tcpudpserver
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: TCP и UDP сервер
+ 
