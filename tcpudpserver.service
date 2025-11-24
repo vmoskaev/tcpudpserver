@@ -1,0 +1,15 @@
+[Unit]
+Description=TCP UDP server
+
+[Service]
+Type=simple
+PIDFile=/run/tcpudpserver.pid
+WorkingDirectory=/usr/bin
+ExecStart=/usr/bin/tcpudpserver
+ExecReload=/bin/kill -9 $MAINPID
+ExecStop=/bin/kill -9 $MAINPID
+TimeoutSec=10
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

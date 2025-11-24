@@ -1,0 +1,12 @@
+/debian/debhelper-build-stamp
+/debian/files
+/debian/tcpudpserver.substvars
+/debian/.debhelper/
+/cmake-build-debug/
+/client/.idea/
+/client/cmake-build-debug/
+/src/*.o
+/tcpudpserver
+/debian/tcpudpserver/
+/client/src/*.o
+/client/tcpudpclient
