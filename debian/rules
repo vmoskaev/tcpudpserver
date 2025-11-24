@@ -8,3 +8,6 @@ export DEB_BUILD_OPTIONS=noautodbgsym
 
 %:
 	dh $@
+
+override_dh_auto_build:
+	./build.sh
