@@ -14,9 +14,6 @@ using namespace std;
 Server::Server( uint16_t port ) :
         BaseClientServer( port )
 {
-    // Инициализируем вектор udp клиентов
-    auto clientAddress = buildSocketAddress( "127.0.0.1", 8081 );
-    udpClients.push_back( make_shared< struct sockaddr_in>( clientAddress ) );
 }
 
 std::string Server::serverMessage( uint16_t port, SocketType typeServer )
@@ -33,6 +30,12 @@ std::string Server::serverMessage( uint16_t port, SocketType typeServer )
 
 Server::Status Server::start( SocketType typeSocket )
 {
+    if( typeSocket == SocketType::UDP ) {
+       // Инициализируем вектор udp клиентов
+       auto clientAddress = buildSocketAddress( "127.0.0.1", 8081 );
+       udpClients.push_back( make_shared< struct sockaddr_in >( clientAddress ) );
+    }
+   
     auto logMsg = serverMessage( m_port, typeSocket );
 
     // Если сервер работает, то вырубаем его
@@ -205,10 +208,9 @@ Server::ProcessState Server::processMessage( char *msg, ssize_t msgSize, int soc
     if( msgSize > 0 ) {
         msg[ msgSize ] = '\0';
         string smsg( msg );
+        cout << logMsg << " Получено сообщение от клиента: " << smsg << endl;
         // Обрабатываем все сообщения, которые начинаются на символ /
         if( smsg.starts_with( '/' ) ) {
-            cout << logMsg << " Получено сообщение от клиента: " << smsg << endl;
-
             if( smsg == "/time" ) {
                const char *const sendSuccess = " Отправлены текущие дата и время клиенту: ";
                const char *const sendFail    =
@@ -243,6 +245,12 @@ Server::ProcessState Server::processMessage( char *msg, ssize_t msgSize, int soc
                     return ProcessState::CLOSE_ERROR;
                 }
             }
+        } else {
+            // Если сообщение от клиента не начинается с символа /, то зеркально отправляем его клиенту
+            const char *const sendSuccess = " Сообщение зеркально отправлено клиенту: ";
+            const char *const sendFail    =
+                    " Не удалось зеркально отправить сообщение клиенту: ";
+            send( socket, logMsg, smsg, typeServer, addr, sendSuccess, sendFail );
         }
     }
 

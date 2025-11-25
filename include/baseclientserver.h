@@ -30,6 +30,8 @@ public:
    {
       // Ошибка инициализации epoll
       EPOLL_CTL_ERROR,
+      // Ошибка ожидания данных epoll
+      EPOLL_WAIT_ERROR,
       // Ошибка закрытия сокета
       CLOSE_ERROR,
       // Сокет закрыт
