@@ -110,13 +110,11 @@ void closeClients( vector< ClientDataPtr >& clients, const string& logMsg ) {
     */
    while( !clients.empty() ) {
       if( clients.size() == 1 ) {
-         if( clients[ 0 ]->client->type() == BaseClientServer::SocketType::TCP ) {
-            // Отправляем запрос на получение статистики сервера
-            const char *const msgStats = "/stats";
-            sendData( clients[ 0 ]->client, logMsg, msgStats );
-            // Ждем 2 секунды
-            this_thread::sleep_for( chrono::seconds( 4 ) );
-         }
+         // Отправляем запрос на получение статистики сервера
+         const char *const msgStats = "/stats";
+         sendData( clients[ 0 ]->client, logMsg, msgStats );
+         // Ждем 2 секунды
+         this_thread::sleep_for( chrono::seconds( 4 ) );
          
          const char *const msgShutdown = "/shutdown";
          sendData( clients[ 0 ]->client, logMsg, msgShutdown );

@@ -128,7 +128,21 @@ bool Client::stop( )
    cout << logMsg << " Останов клиента. " << endl;
    // Прекращаем поток обработки данных от сервера
    m_isStop = true;
-   // Закрываем сокет клиента
-   return close( m_socket ) == 0;
+   int result;
+   bool isSuccess;
+   // Отключаем соединение и закрываем сокет, если это TCP сервер
+   if( type() == SocketType::TCP ) {
+      if( shutdown( m_socket, SHUT_RDWR ) == 0 ) {
+         result = close( m_socket );
+         isSuccess = result != -1;
+      } else
+         isSuccess = false;
+   } else {
+      // Для UDP сервера просто закрываем сокет
+      result = close( m_socket );
+      isSuccess = result != -1;
+   }
+   
+   return isSuccess;
 }
 
