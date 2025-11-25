@@ -22,14 +22,19 @@ public:
       TCP,
       UDP
    };
-   
+
+   /**
+    * Состояние обработки полученных данных
+    */
    enum class ProcessState
    {
+      // Ошибка инициализации epoll
       EPOLL_CTL_ERROR,
-      EPOLL_WAIT_ERROR,
-      ACCEPT_ERROR,
+      // Ошибка закрытия сокета
       CLOSE_ERROR,
+      // Сокет закрыт
       CLOSE,
+      // Успешное выполнение
       SUCCESS
    };
    
@@ -42,24 +47,39 @@ public:
     * Деструктор
     */
    virtual ~BaseClientServer() = default;
-   
+
+   /**
+    * Возвращает признак останова обработки данных клиентом
+    * @return признак останова
+    */
+   bool* isStop();
+
+   /**
+    * Возвращает сокет
+    * @return сокет
+    */
    [[nodiscard]] int currentSocket() const;
    
    /**
     * Формирует адрес для сервера
+    * @param serverAddress ip сервера
     * @param port порт сервера
     * @return адрес сервера
     */
    static sockaddr_in buildSocketAddress( const char* serverAddress, uint16_t port );
-   
+
+   /**
+    * Формирует и возвращает текущие дату и время
+    * @return текущая дата и время
+    */
    static std::string currentDateTime( );
 protected:
    // Сокет
    int m_socket = -1;
    // Порт
    uint16_t m_port = -1;
+   // Признак останова потока обработки данных
    bool m_isStop = false;
-   
    
    /**
     * Открывает сокет

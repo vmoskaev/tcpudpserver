@@ -8,6 +8,11 @@ m_port( port ) {
 
 }
 
+bool* BaseClientServer::isStop()
+{
+   return &m_isStop;
+}
+
 int BaseClientServer::currentSocket( ) const
 {
    return m_socket;
@@ -33,6 +38,7 @@ int BaseClientServer::openSocket( SocketType type )
 
 std::string BaseClientServer::currentDateTime( )
 {
+   // Получаем текущую дату и время, преобразуем в формат "YY-MM-DD hh:mm:ss" и возвращаем
    using namespace std;
    using namespace chrono;
    auto date  = system_clock::now( );
