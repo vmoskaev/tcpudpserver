@@ -120,7 +120,15 @@ void closeClients( vector< ClientDataPtr >& clients, const string& logMsg ) {
          sendData( clients[ 0 ]->client, logMsg, msgShutdown );
          stopClient( clients, 0 );
       } else {
+         // Отправляем запрос на получение статистики сервера
          size_t indexClient = clients.size( ) - 1;
+         if( clients[ indexClient ]->client->type() == BaseClientServer::SocketType::TCP ) {
+            const char *const msgStats = "/stats";
+            sendData( clients[ indexClient ]->client, logMsg, msgStats );
+            // Ждем 2 секунды
+            this_thread::sleep_for( chrono::seconds( 4 ) );
+         }
+         
          stopClient( clients, indexClient );
       }
    }
@@ -137,13 +145,13 @@ int main() {
    const int tcpServerPort = 8080;
    const int udpServerPort = 8081;
    // В цикле создаем TCP и UDP сервер и добавляем их в списки
-   for( int i = 0; i < 2; ++i ) {
+   for( int i = 0; i < 5; ++i ) {
       auto clientData = createClient( serverIp, tcpServerPort, Client::SocketType::TCP );
       tcpClients.push_back( clientData );
-      
-      clientData = createClient( serverIp, udpServerPort, Client::SocketType::UDP );
-      udpClients.push_back( clientData );
    }
+   
+   auto clientData = createClient( serverIp, udpServerPort, Client::SocketType::UDP );
+   udpClients.push_back( clientData );
    
    // Закрываем TCP и UDP клиенты
    auto      logMsg = Client::clientMessage( serverIp, tcpServerPort,
