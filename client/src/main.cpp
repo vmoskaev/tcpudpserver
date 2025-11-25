@@ -80,6 +80,11 @@ ClientDataPtr createClient( const char *const serverIp, int port, Client::Socket
          sendData( client, logMsg, msgHello );
          // Ждем 2 секунды
          this_thread::sleep_for( chrono::seconds( 2 ) );
+          // Отправляем произвольное сообщение
+          const char *const msgAny = "Are you sleeping?";
+          sendData( client, logMsg, msgAny );
+          // Ждем 2 секунды
+          this_thread::sleep_for( chrono::seconds( 2 ) );
       }
       
       clientData->client = client;
