@@ -153,10 +153,10 @@ int main() {
    for( int i = 0; i < 5; ++i ) {
       auto clientData = createClient( serverIp, tcpServerPort, Client::SocketType::TCP );
       tcpClients.push_back( clientData );
+      
+      clientData = createClient( serverIp, udpServerPort, Client::SocketType::UDP );
+      udpClients.push_back( clientData );
    }
-   
-   auto clientData = createClient( serverIp, udpServerPort, Client::SocketType::UDP );
-   udpClients.push_back( clientData );
    
    // Закрываем TCP и UDP клиенты
    auto      logMsg = Client::clientMessage( serverIp, tcpServerPort,
