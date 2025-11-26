@@ -1,4 +1,5 @@
 #include <sys/epoll.h>
+#include <arpa/inet.h>
 #include <unistd.h>
 #include <cstdio>
 #include <string>
@@ -30,12 +31,6 @@ std::string Server::serverMessage( uint16_t port, SocketType typeServer )
 
 Server::Status Server::start( SocketType typeSocket )
 {
-    if( typeSocket == SocketType::UDP ) {
-       // Инициализируем вектор udp клиентов
-       auto clientAddress = buildSocketAddress( "127.0.0.1", 8081 );
-       udpClients.push_back( make_shared< struct sockaddr_in >( clientAddress ) );
-    }
-   
     auto logMsg = serverMessage( m_port, typeSocket );
 
     // Если сервер работает, то вырубаем его
@@ -175,22 +170,29 @@ Server::ProcessState Server::process( int socket, uint16_t port, bool* isStop,
                         }
                     }
                 } else {
-                    // Если это UDP сервер, то тут нет механизма подключения клиентов
-
-                    // Идем по вектору клиентов
-                    for( const auto& clientAddr : udpClients ) {
-                        // Получаем адрес и сообщение от клиента
-                        auto addr = clientAddr.get( );
-                        socklen_t addressLen = sizeof( struct sockaddr );
-                        buflen = recvfrom( cfd, buf, BUFSIZ - 1, MSG_CONFIRM,
-                                           reinterpret_cast< struct sockaddr * >( addr ),
-                                           &addressLen );
-                        // Обрабатываем сообщение от клиента
-                        if( ( status = processMessage( buf, buflen, cfd, logMsg, typeServer, addr,
-                                                       isStop ) ) ==
-                            ProcessState::CLOSE_ERROR )
-                            return status;
-                    }
+                   // Если это UDP сервер, то тут нет механизма подключения клиентов
+                   
+                   // Получаем адрес и сообщение от клиента
+                   struct sockaddr_in clientAddr{};
+                   socklen_t addressLen = sizeof( struct sockaddr );
+                   buflen = recvfrom( cfd, buf, BUFSIZ - 1, MSG_CONFIRM,
+                                      reinterpret_cast< struct sockaddr * >( &clientAddr ),
+                                      &addressLen );
+                   auto address = make_pair( inet_ntoa( clientAddr.sin_addr ), clientAddr.sin_port );
+                   bool isSuchAddress = false;
+                   for( const auto& curAddr : udpClients ) {
+                      if( curAddr.first == address.first
+                          && curAddr.second == address.second ) {
+                         isSuchAddress = true;
+                      }
+                   }
+                   if( !isSuchAddress )
+                      udpClients.emplace_back( address );
+                   // Обрабатываем сообщение от клиента
+                   if( ( status = processMessage( buf, buflen, cfd, logMsg, typeServer, &clientAddr,
+                                                  isStop ) ) ==
+                       ProcessState::CLOSE_ERROR )
+                      return status;
                 }
             }
         }

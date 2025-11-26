@@ -10,7 +10,7 @@
 
 static const char *const ipServer = "127.0.0.1";
 
-static std::vector< std::shared_ptr< struct sockaddr_in > > udpClients;
+static std::vector< std::pair< const char*, int > > udpClients;
 static std::vector< int > tcpClientSockets;
 static int countAllClients{};
 
